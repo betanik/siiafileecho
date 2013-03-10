@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+
+	<int-stream:stdout-channel-adapter id="outputChannel" />
+
+	<job id="importProducts" xmlns="http://www.springframework.org/schema/batch">
+		<step id="decompress" next="readWriteProducts">
+			<tasklet ref="decompressTasklet" />
+		</step>
+		<step id="readWriteProducts">
+			<tasklet ref="sftpJobTasklet" />		
+		</step>
+	</job>
+	
+	<bean id="sftpJobTasklet" class="net.nat.siiafileecho.SftpTasklet" scope="step">
+	  <property name="fileName" value="#{jobParameters['targetDirectory']+jobParameters['targetFile']}" />
+	  <property name="sftpChannel" ref="outputChannel" />
+	</bean>
+	
+	<bean id="decompressTasklet" class="com.manning.sbia.ch01.batch.DecompressTasklet" scope="step">
+		<property name="inputResource" value="#{jobParameters['inputResource']}" />
+		<property name="targetDirectory" value="#{jobParameters['targetDirectory']}" />
+		<property name="targetFile" value="#{jobParameters['targetFile']}" />
+	</bean>
+
+</beans>
