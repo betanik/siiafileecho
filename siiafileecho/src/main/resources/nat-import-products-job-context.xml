@@ -20,8 +20,15 @@
 		<property name="port" value="22" />
 	</bean>
 	
+	<bean id="cachingSessionFactory"
+	    class="org.springframework.integration.file.remote.session.CachingSessionFactory">
+	    <constructor-arg ref="sftpSessionFactory"/>
+	    <property name="poolSize" value="0"/>
+	    <property name="sessionWaitTimeout" value="1000"/>
+	</bean>
+	
 	<int-sftp:outbound-channel-adapter id="sftpOutboundAdapter"
-	  session-factory="sftpSessionFactory"
+	  session-factory="cachingSessionFactory"
 	  channel="outputChannel"
 	  charset="UTF-8"
 	  remote-directory="/Users/betanik/git/siiafileecho/siiafileecho/sftped"

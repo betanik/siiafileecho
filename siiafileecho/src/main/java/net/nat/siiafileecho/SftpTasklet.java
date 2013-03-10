@@ -23,11 +23,7 @@ public class SftpTasklet implements Tasklet {
    File file = new File(fileName);
    if (file.exists()) {
      Message message = MessageBuilder.withPayload(file).build();
-     try {
-       sftpChannel.send(message);
-     } catch (Exception e) {
-       System.out.println("Could not send file per SFTP: " + e);
-     }
+     sftpChannel.send(message);
    } else {
      System.out.println("File does not exist.");
    }
